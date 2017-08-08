@@ -7,10 +7,20 @@ var cheerio = require('cheerio'); //jquery 库
 var request = require('request'); //爬图片用
 var i = 0;
 var url = "http://www.ss.pku.edu.cn/index.php/newscenter/news/2391";
+var mongoose = require('mongoose');
+mongoose.connect('mongodb://localhost:27017/runoob');
+
+var PersonSchema = new mongoose.Schema({          //json的结构;
+         title:String   //定义一个属性name，类型为String
+    });
+
+ var name = mongoose.model('name', PersonSchema );   //创建model
 
 function fetchPage(x){
   startRequest(x);
 }
+
+
 
 function startRequest(x){
   //using http to give an get request
@@ -34,9 +44,17 @@ function startRequest(x){
         author:$('[title=供稿]').text().trim(),
         i:i = i+1
       };
-      console.log(news_item);
+      // console.log(news_item);
       var news_title = $('div.article-title a').text().trim();
-      savedContent($,news_title);
+      console.log(news_title);
+      var carHref = new name({ title: news_title });  //存入mongodb;
+      carHref.save(function (err) {
+        if (err) {
+          console.log(err);
+        }
+      });
+
+      // savedContent($,news_title);
       // savedImg($,news_title);
 
       // url of next article
