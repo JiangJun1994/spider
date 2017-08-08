@@ -2,7 +2,7 @@
  * Created by jiangjun on 2017/8/8.
  */
 /**
- * Created by jiangjun on 2017/8/3.
+ * Created by jiangjun on 2017/8/3.  mongo 的方式连接数据库并且保存数据，//line 44
  */
 var http = require ("http");
 var fs = require ('fs');
@@ -10,6 +10,8 @@ var cheerio = require('cheerio'); //jquery 库
 var request = require('request'); //爬图片用
 var i = 0;
 var url = "http://www.ss.pku.edu.cn/index.php/newscenter/news/2391";
+var MongoClient = require('mongodb').MongoClient;
+var DB_CONN_STR = 'mongodb://localhost:27017/runoob';
 
 function fetchPage(x){
   startRequest(x);
@@ -39,7 +41,20 @@ function startRequest(x){
       };
       console.log(news_item);
       var news_title = $('div.article-title a').text().trim();
-      savedContent($,news_title);
+      var data = [{"hello":news_title}];
+      MongoClient.connect(DB_CONN_STR, function(err, db) {
+        console.log("连接成功！");
+        var collection = db.collection('site');
+        collection.insert(data, function(err, result) {
+          if(err) {
+            console.log('Error:'+ err);
+            return;
+          }else{
+            console.log(result)
+          }
+        });
+      });
+      // savedContent($,news_title);
       // savedImg($,news_title);
 
       // url of next article
